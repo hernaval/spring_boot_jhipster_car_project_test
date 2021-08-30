@@ -30,14 +30,15 @@ public class AuthResource {
 
     private final Logger log = LoggerFactory.getLogger(ClientResource.class);
     private final ClientService clientService;
-    private final AuthenticationManager authenticationManager;
 
     @Autowired
-    private TokenProvider tokenProvider;
+    AuthenticationManager authenticationManager;
 
-    public AuthResource(ClientService clientService, AuthenticationManager authenticationManager) {
+    @Autowired
+    TokenProvider tokenProvider;
+
+    public AuthResource(ClientService clientService) {
         this.clientService = clientService;
-        this.authenticationManager = authenticationManager;
     }
 
     @PostMapping("login")

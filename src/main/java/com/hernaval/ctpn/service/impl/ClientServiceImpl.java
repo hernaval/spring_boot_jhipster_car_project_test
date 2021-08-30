@@ -12,8 +12,10 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +32,9 @@ public class ClientServiceImpl implements ClientService {
 
     private final ClientMapper clientMapper;
 
+    @Autowired
+    PasswordEncoder encoder;
+
     public ClientServiceImpl(ClientRepository clientRepository, ClientMapper clientMapper) {
         this.clientRepository = clientRepository;
         this.clientMapper = clientMapper;
@@ -45,6 +50,7 @@ public class ClientServiceImpl implements ClientService {
 
     @Override
     public ClientDTO signup(ClientDTO clientDTO) throws BadRequestException {
+        clientDTO.setPassword(encoder.encode(clientDTO.getPassword()));
         log.debug("Request to save Client : {}", clientDTO);
         Client client = clientMapper.toEntity(clientDTO);
         if (clientRepository.existsByUsername(clientDTO.getUsername())) {
