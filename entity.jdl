@@ -1,0 +1,36 @@
+
+
+entity Client {
+	firstname String
+    lastname String
+    email String
+}
+entity Car{
+	mark String
+    description String
+}
+
+entity Comment {
+	message String
+    publishDate Instant
+}
+
+relationship OneToMany {
+	Client to Comment
+}
+relationship OneToMany {
+	Car to Comment
+}
+
+
+paginate Car with pagination
+
+// Use Data Transfer Objects (DTO)
+dto * with mapstruct
+
+// Set service options to all 
+service all with serviceImpl 
+
+// Set an angular suffix
+// angularSuffix * with mySuffix
+

@@ -1,0 +1,40 @@
+{
+  "name": "Comment",
+  "fields": [
+    {
+      "fieldName": "message",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "publishDate",
+      "fieldType": "Instant"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "client",
+      "otherEntityRelationshipName": "comment",
+      "relationshipName": "client"
+    },
+    {
+      "relationshipType": "many-to-one",
+      "otherEntityName": "car",
+      "otherEntityRelationshipName": "comment",
+      "relationshipName": "car"
+    }
+  ],
+  "entityTableName": "comment",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "microserviceName": "CarTestProjectNaval",
+  "clientRootFolder": "CarTestProjectNaval",
+  "databaseType": "sql",
+  "changelogDate": "20210830165801"
+}

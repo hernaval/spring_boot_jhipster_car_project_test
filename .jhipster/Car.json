@@ -1,0 +1,34 @@
+{
+  "name": "Car",
+  "fields": [
+    {
+      "fieldName": "mark",
+      "fieldType": "String"
+    },
+    {
+      "fieldName": "description",
+      "fieldType": "String"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "one-to-many",
+      "otherEntityName": "comment",
+      "otherEntityRelationshipName": "car",
+      "relationshipName": "comment"
+    }
+  ],
+  "entityTableName": "car",
+  "dto": "mapstruct",
+  "pagination": "pagination",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "microserviceName": "CarTestProjectNaval",
+  "clientRootFolder": "CarTestProjectNaval",
+  "databaseType": "sql",
+  "changelogDate": "20210830165800"
+}
