@@ -1,5 +1,7 @@
 package com.hernaval.ctpn.security.jwt;
 
+import com.hernaval.ctpn.service.impl.UserDetailServiceImpl;
+import com.hernaval.ctpn.service.impl.UserDetailsImpl;
 import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -9,11 +11,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.util.ObjectUtils;
 import tech.jhipster.config.JHipsterProperties;
@@ -32,6 +36,9 @@ public class TokenProvider {
     private final long tokenValidityInMilliseconds;
 
     private final long tokenValidityInMillisecondsForRememberMe;
+
+    @Autowired
+    private UserDetailServiceImpl userDetailService;
 
     public TokenProvider(JHipsterProperties jHipsterProperties) {
         byte[] keyBytes;
@@ -56,7 +63,7 @@ public class TokenProvider {
 
     public String createToken(Authentication authentication, boolean rememberMe) {
         String authorities = authentication.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.joining(","));
-
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
         long now = (new Date()).getTime();
         Date validity;
         if (rememberMe) {
@@ -67,7 +74,7 @@ public class TokenProvider {
 
         return Jwts
             .builder()
-            .setSubject(authentication.getName())
+            .setSubject(userPrincipal.getUsername())
             .claim(AUTHORITIES_KEY, authorities)
             .signWith(key, SignatureAlgorithm.HS512)
             .setExpiration(validity)
@@ -83,9 +90,9 @@ public class TokenProvider {
             .map(SimpleGrantedAuthority::new)
             .collect(Collectors.toList());
 
-        User principal = new User(claims.getSubject(), "", authorities);
+        UserDetails userDetails = userDetailService.loadUserByUsername(claims.getSubject());
 
-        return new UsernamePasswordAuthenticationToken(principal, token, authorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, token, authorities);
     }
 
     public boolean validateToken(String authToken) {

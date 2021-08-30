@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +50,7 @@ public class ClientResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/clients")
-    public ResponseEntity<ClientDTO> createClient(@RequestBody ClientDTO clientDTO) throws URISyntaxException {
+    public ResponseEntity<ClientDTO> createClient(@Valid @RequestBody ClientDTO clientDTO) throws URISyntaxException {
         log.debug("REST request to save Client : {}", clientDTO);
         if (clientDTO.getId() != null) {
             throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
@@ -73,7 +75,7 @@ public class ClientResource {
     @PutMapping("/clients/{id}")
     public ResponseEntity<ClientDTO> updateClient(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ClientDTO clientDTO
+        @Valid @RequestBody ClientDTO clientDTO
     ) throws URISyntaxException {
         log.debug("REST request to update Client : {}, {}", id, clientDTO);
         if (clientDTO.getId() == null) {
@@ -108,7 +110,7 @@ public class ClientResource {
     @PatchMapping(value = "/clients/{id}", consumes = "application/merge-patch+json")
     public ResponseEntity<ClientDTO> partialUpdateClient(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody ClientDTO clientDTO
+        @NotNull @RequestBody ClientDTO clientDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update Client partially : {}, {}", id, clientDTO);
         if (clientDTO.getId() == null) {
@@ -133,10 +135,11 @@ public class ClientResource {
     /**
      * {@code GET  /clients} : get all the clients.
      *
+     * @param eagerload flag to eager load entities from relationships (This is applicable for many-to-many).
      * @return the {@link ResponseEntity} with status {@code 200 (OK)} and the list of clients in body.
      */
     @GetMapping("/clients")
-    public List<ClientDTO> getAllClients() {
+    public List<ClientDTO> getAllClients(@RequestParam(required = false, defaultValue = "false") boolean eagerload) {
         log.debug("REST request to get all Clients");
         return clientService.findAll();
     }

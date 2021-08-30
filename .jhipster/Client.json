@@ -11,7 +11,18 @@
     },
     {
       "fieldName": "email",
-      "fieldType": "String"
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "username",
+      "fieldType": "String",
+      "fieldValidateRules": ["required", "unique"]
+    },
+    {
+      "fieldName": "password",
+      "fieldType": "String",
+      "fieldValidateRules": ["required"]
     }
   ],
   "relationships": [
@@ -20,6 +31,13 @@
       "otherEntityName": "comment",
       "otherEntityRelationshipName": "client",
       "relationshipName": "comment"
+    },
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "role",
+      "otherEntityRelationshipName": "client",
+      "relationshipName": "role",
+      "ownerSide": true
     }
   ],
   "entityTableName": "client",

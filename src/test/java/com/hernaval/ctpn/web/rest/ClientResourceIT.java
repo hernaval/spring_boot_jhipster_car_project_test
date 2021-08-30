@@ -2,22 +2,30 @@ package com.hernaval.ctpn.web.rest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.hasItem;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 import com.hernaval.ctpn.IntegrationTest;
 import com.hernaval.ctpn.domain.Client;
 import com.hernaval.ctpn.repository.ClientRepository;
+import com.hernaval.ctpn.service.ClientService;
 import com.hernaval.ctpn.service.dto.ClientDTO;
 import com.hernaval.ctpn.service.mapper.ClientMapper;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
@@ -27,6 +35,7 @@ import org.springframework.transaction.annotation.Transactional;
  * Integration tests for the {@link ClientResource} REST controller.
  */
 @IntegrationTest
+@ExtendWith(MockitoExtension.class)
 @AutoConfigureMockMvc
 @WithMockUser
 class ClientResourceIT {
@@ -40,6 +49,12 @@ class ClientResourceIT {
     private static final String DEFAULT_EMAIL = "AAAAAAAAAA";
     private static final String UPDATED_EMAIL = "BBBBBBBBBB";
 
+    private static final String DEFAULT_USERNAME = "AAAAAAAAAA";
+    private static final String UPDATED_USERNAME = "BBBBBBBBBB";
+
+    private static final String DEFAULT_PASSWORD = "AAAAAAAAAA";
+    private static final String UPDATED_PASSWORD = "BBBBBBBBBB";
+
     private static final String ENTITY_API_URL = "/api/clients";
     private static final String ENTITY_API_URL_ID = ENTITY_API_URL + "/{id}";
 
@@ -49,8 +64,14 @@ class ClientResourceIT {
     @Autowired
     private ClientRepository clientRepository;
 
+    @Mock
+    private ClientRepository clientRepositoryMock;
+
     @Autowired
     private ClientMapper clientMapper;
+
+    @Mock
+    private ClientService clientServiceMock;
 
     @Autowired
     private EntityManager em;
@@ -67,7 +88,12 @@ class ClientResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Client createEntity(EntityManager em) {
-        Client client = new Client().firstname(DEFAULT_FIRSTNAME).lastname(DEFAULT_LASTNAME).email(DEFAULT_EMAIL);
+        Client client = new Client()
+            .firstname(DEFAULT_FIRSTNAME)
+            .lastname(DEFAULT_LASTNAME)
+            .email(DEFAULT_EMAIL)
+            .username(DEFAULT_USERNAME)
+            .password(DEFAULT_PASSWORD);
         return client;
     }
 
@@ -78,7 +104,12 @@ class ClientResourceIT {
      * if they test an entity which requires the current entity.
      */
     public static Client createUpdatedEntity(EntityManager em) {
-        Client client = new Client().firstname(UPDATED_FIRSTNAME).lastname(UPDATED_LASTNAME).email(UPDATED_EMAIL);
+        Client client = new Client()
+            .firstname(UPDATED_FIRSTNAME)
+            .lastname(UPDATED_LASTNAME)
+            .email(UPDATED_EMAIL)
+            .username(UPDATED_USERNAME)
+            .password(UPDATED_PASSWORD);
         return client;
     }
 
@@ -104,6 +135,8 @@ class ClientResourceIT {
         assertThat(testClient.getFirstname()).isEqualTo(DEFAULT_FIRSTNAME);
         assertThat(testClient.getLastname()).isEqualTo(DEFAULT_LASTNAME);
         assertThat(testClient.getEmail()).isEqualTo(DEFAULT_EMAIL);
+        assertThat(testClient.getUsername()).isEqualTo(DEFAULT_USERNAME);
+        assertThat(testClient.getPassword()).isEqualTo(DEFAULT_PASSWORD);
     }
 
     @Test
@@ -127,6 +160,60 @@ class ClientResourceIT {
 
     @Test
     @Transactional
+    void checkEmailIsRequired() throws Exception {
+        int databaseSizeBeforeTest = clientRepository.findAll().size();
+        // set the field null
+        client.setEmail(null);
+
+        // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
+        restClientMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Client> clientList = clientRepository.findAll();
+        assertThat(clientList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkUsernameIsRequired() throws Exception {
+        int databaseSizeBeforeTest = clientRepository.findAll().size();
+        // set the field null
+        client.setUsername(null);
+
+        // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
+        restClientMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Client> clientList = clientRepository.findAll();
+        assertThat(clientList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
+    void checkPasswordIsRequired() throws Exception {
+        int databaseSizeBeforeTest = clientRepository.findAll().size();
+        // set the field null
+        client.setPassword(null);
+
+        // Create the Client, which fails.
+        ClientDTO clientDTO = clientMapper.toDto(client);
+
+        restClientMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(clientDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Client> clientList = clientRepository.findAll();
+        assertThat(clientList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllClients() throws Exception {
         // Initialize the database
         clientRepository.saveAndFlush(client);
@@ -139,7 +226,27 @@ class ClientResourceIT {
             .andExpect(jsonPath("$.[*].id").value(hasItem(client.getId().intValue())))
             .andExpect(jsonPath("$.[*].firstname").value(hasItem(DEFAULT_FIRSTNAME)))
             .andExpect(jsonPath("$.[*].lastname").value(hasItem(DEFAULT_LASTNAME)))
-            .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)));
+            .andExpect(jsonPath("$.[*].email").value(hasItem(DEFAULT_EMAIL)))
+            .andExpect(jsonPath("$.[*].username").value(hasItem(DEFAULT_USERNAME)))
+            .andExpect(jsonPath("$.[*].password").value(hasItem(DEFAULT_PASSWORD)));
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllClientsWithEagerRelationshipsIsEnabled() throws Exception {
+        when(clientServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restClientMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(clientServiceMock, times(1)).findAllWithEagerRelationships(any());
+    }
+
+    @SuppressWarnings({ "unchecked" })
+    void getAllClientsWithEagerRelationshipsIsNotEnabled() throws Exception {
+        when(clientServiceMock.findAllWithEagerRelationships(any())).thenReturn(new PageImpl(new ArrayList<>()));
+
+        restClientMockMvc.perform(get(ENTITY_API_URL + "?eagerload=true")).andExpect(status().isOk());
+
+        verify(clientServiceMock, times(1)).findAllWithEagerRelationships(any());
     }
 
     @Test
@@ -156,7 +263,9 @@ class ClientResourceIT {
             .andExpect(jsonPath("$.id").value(client.getId().intValue()))
             .andExpect(jsonPath("$.firstname").value(DEFAULT_FIRSTNAME))
             .andExpect(jsonPath("$.lastname").value(DEFAULT_LASTNAME))
-            .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL));
+            .andExpect(jsonPath("$.email").value(DEFAULT_EMAIL))
+            .andExpect(jsonPath("$.username").value(DEFAULT_USERNAME))
+            .andExpect(jsonPath("$.password").value(DEFAULT_PASSWORD));
     }
 
     @Test
@@ -178,7 +287,12 @@ class ClientResourceIT {
         Client updatedClient = clientRepository.findById(client.getId()).get();
         // Disconnect from session so that the updates on updatedClient are not directly saved in db
         em.detach(updatedClient);
-        updatedClient.firstname(UPDATED_FIRSTNAME).lastname(UPDATED_LASTNAME).email(UPDATED_EMAIL);
+        updatedClient
+            .firstname(UPDATED_FIRSTNAME)
+            .lastname(UPDATED_LASTNAME)
+            .email(UPDATED_EMAIL)
+            .username(UPDATED_USERNAME)
+            .password(UPDATED_PASSWORD);
         ClientDTO clientDTO = clientMapper.toDto(updatedClient);
 
         restClientMockMvc
@@ -196,6 +310,8 @@ class ClientResourceIT {
         assertThat(testClient.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
         assertThat(testClient.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testClient.getEmail()).isEqualTo(UPDATED_EMAIL);
+        assertThat(testClient.getUsername()).isEqualTo(UPDATED_USERNAME);
+        assertThat(testClient.getPassword()).isEqualTo(UPDATED_PASSWORD);
     }
 
     @Test
@@ -292,6 +408,8 @@ class ClientResourceIT {
         assertThat(testClient.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
         assertThat(testClient.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testClient.getEmail()).isEqualTo(UPDATED_EMAIL);
+        assertThat(testClient.getUsername()).isEqualTo(DEFAULT_USERNAME);
+        assertThat(testClient.getPassword()).isEqualTo(DEFAULT_PASSWORD);
     }
 
     @Test
@@ -306,7 +424,12 @@ class ClientResourceIT {
         Client partialUpdatedClient = new Client();
         partialUpdatedClient.setId(client.getId());
 
-        partialUpdatedClient.firstname(UPDATED_FIRSTNAME).lastname(UPDATED_LASTNAME).email(UPDATED_EMAIL);
+        partialUpdatedClient
+            .firstname(UPDATED_FIRSTNAME)
+            .lastname(UPDATED_LASTNAME)
+            .email(UPDATED_EMAIL)
+            .username(UPDATED_USERNAME)
+            .password(UPDATED_PASSWORD);
 
         restClientMockMvc
             .perform(
@@ -323,6 +446,8 @@ class ClientResourceIT {
         assertThat(testClient.getFirstname()).isEqualTo(UPDATED_FIRSTNAME);
         assertThat(testClient.getLastname()).isEqualTo(UPDATED_LASTNAME);
         assertThat(testClient.getEmail()).isEqualTo(UPDATED_EMAIL);
+        assertThat(testClient.getUsername()).isEqualTo(UPDATED_USERNAME);
+        assertThat(testClient.getPassword()).isEqualTo(UPDATED_PASSWORD);
     }
 
     @Test

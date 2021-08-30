@@ -3,6 +3,8 @@ package com.hernaval.ctpn.service;
 import com.hernaval.ctpn.service.dto.ClientDTO;
 import java.util.List;
 import java.util.Optional;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 /**
  * Service Interface for managing {@link com.hernaval.ctpn.domain.Client}.
@@ -30,6 +32,14 @@ public interface ClientService {
      * @return the list of entities.
      */
     List<ClientDTO> findAll();
+
+    /**
+     * Get all the clients with eager load of many-to-many relationships.
+     *
+     * @param pageable the pagination information.
+     * @return the list of entities.
+     */
+    Page<ClientDTO> findAllWithEagerRelationships(Pageable pageable);
 
     /**
      * Get the "id" client.

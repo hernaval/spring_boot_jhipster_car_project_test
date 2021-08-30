@@ -125,6 +125,24 @@ class CommentResourceIT {
 
     @Test
     @Transactional
+    void checkMessageIsRequired() throws Exception {
+        int databaseSizeBeforeTest = commentRepository.findAll().size();
+        // set the field null
+        comment.setMessage(null);
+
+        // Create the Comment, which fails.
+        CommentDTO commentDTO = commentMapper.toDto(comment);
+
+        restCommentMockMvc
+            .perform(post(ENTITY_API_URL).contentType(MediaType.APPLICATION_JSON).content(TestUtil.convertObjectToJsonBytes(commentDTO)))
+            .andExpect(status().isBadRequest());
+
+        List<Comment> commentList = commentRepository.findAll();
+        assertThat(commentList).hasSize(databaseSizeBeforeTest);
+    }
+
+    @Test
+    @Transactional
     void getAllComments() throws Exception {
         // Initialize the database
         commentRepository.saveAndFlush(comment);

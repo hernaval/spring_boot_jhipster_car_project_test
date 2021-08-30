@@ -38,7 +38,7 @@
     "packageFolder": "com/hernaval/ctpn",
     "jwtSecretKey": "NDBkMDhmYTcxZGUwZmQ1MjZiZDg1MzJjYjdhYjQ4OGI3YWEyYWIxMTI4ZDc1ZGZiZDRlYmQwNGE4NzY3MDQ3YjVhMTU0YjRiNjEyMTBkMjUzYzZlMzYzZGMxYzAzN2ZhYzFlNWI5NzlmZDVjYzJlMDJhOGY0ZGY5NjljODMxMDI=",
     "languages": ["en", "fr"],
-    "entities": ["Car", "Comment", "Client"],
-    "lastLiquibaseTimestamp": 1630343727000
+    "entities": ["Car", "Comment", "Client", "Role"],
+    "lastLiquibaseTimestamp": 1630350253000
   }
 }

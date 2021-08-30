@@ -1,9 +1,14 @@
 
 
 entity Client {
-	firstname String
+	firstname String 
     lastname String
-    email String
+    email String	required unique
+    username String required unique
+    password String required 
+}
+entity Role {
+	name ERole
 }
 entity Car{
 	mark String
@@ -11,7 +16,7 @@ entity Car{
 }
 
 entity Comment {
-	message String
+	message String	required
     publishDate Instant
 }
 
@@ -20,6 +25,12 @@ relationship OneToMany {
 }
 relationship OneToMany {
 	Car to Comment
+}
+relationship ManyToMany {
+	Client{role} to Role{client}
+}
+enum ERole{
+	ROLE_ADMIN,ROLE_USER,ROLE_ANONYMOUS
 }
 
 

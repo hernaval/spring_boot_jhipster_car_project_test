@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
 import java.time.Instant;
 import javax.persistence.*;
+import javax.validation.constraints.*;
 
 /**
  * A Comment.
@@ -19,14 +20,15 @@ public class Comment implements Serializable {
     @SequenceGenerator(name = "sequenceGenerator")
     private Long id;
 
-    @Column(name = "message")
+    @NotNull
+    @Column(name = "message", nullable = false)
     private String message;
 
     @Column(name = "publish_date")
     private Instant publishDate;
 
     @ManyToOne
-    @JsonIgnoreProperties(value = { "comments" }, allowSetters = true)
+    @JsonIgnoreProperties(value = { "comments", "roles" }, allowSetters = true)
     private Client client;
 
     @ManyToOne

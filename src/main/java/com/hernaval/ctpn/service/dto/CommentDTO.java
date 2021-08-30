@@ -3,6 +3,7 @@ package com.hernaval.ctpn.service.dto;
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link com.hernaval.ctpn.domain.Comment} entity.
@@ -11,6 +12,7 @@ public class CommentDTO implements Serializable {
 
     private Long id;
 
+    @NotNull
     private String message;
 
     private Instant publishDate;

@@ -9,6 +9,8 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javax.validation.Valid;
+import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,7 +50,7 @@ public class CommentResource {
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/comments")
-    public ResponseEntity<CommentDTO> createComment(@RequestBody CommentDTO commentDTO) throws URISyntaxException {
+    public ResponseEntity<CommentDTO> createComment(@Valid @RequestBody CommentDTO commentDTO) throws URISyntaxException {
         log.debug("REST request to save Comment : {}", commentDTO);
         if (commentDTO.getId() != null) {
             throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
@@ -73,7 +75,7 @@ public class CommentResource {
     @PutMapping("/comments/{id}")
     public ResponseEntity<CommentDTO> updateComment(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody CommentDTO commentDTO
+        @Valid @RequestBody CommentDTO commentDTO
     ) throws URISyntaxException {
         log.debug("REST request to update Comment : {}, {}", id, commentDTO);
         if (commentDTO.getId() == null) {
@@ -108,7 +110,7 @@ public class CommentResource {
     @PatchMapping(value = "/comments/{id}", consumes = "application/merge-patch+json")
     public ResponseEntity<CommentDTO> partialUpdateComment(
         @PathVariable(value = "id", required = false) final Long id,
-        @RequestBody CommentDTO commentDTO
+        @NotNull @RequestBody CommentDTO commentDTO
     ) throws URISyntaxException {
         log.debug("REST request to partial update Comment partially : {}, {}", id, commentDTO);
         if (commentDTO.getId() == null) {

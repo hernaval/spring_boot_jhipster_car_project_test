@@ -1,10 +1,10 @@
 package com.hernaval.ctpn.service.dto;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.HashSet;
 import java.util.Objects;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import java.util.Set;
+import javax.validation.constraints.*;
 
 /**
  * A DTO for the {@link com.hernaval.ctpn.domain.Client} entity.
@@ -17,7 +17,16 @@ public class ClientDTO implements Serializable {
 
     private String lastname;
 
+    @NotNull
     private String email;
+
+    @NotNull
+    private String username;
+
+    @NotNull
+    private String password;
+
+    private Set<RoleDTO> roles = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -51,6 +60,30 @@ public class ClientDTO implements Serializable {
         this.email = email;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<RoleDTO> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<RoleDTO> roles) {
+        this.roles = roles;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -80,6 +113,9 @@ public class ClientDTO implements Serializable {
             ", firstname='" + getFirstname() + "'" +
             ", lastname='" + getLastname() + "'" +
             ", email='" + getEmail() + "'" +
+            ", username='" + getUsername() + "'" +
+            ", password='" + getPassword() + "'" +
+            ", roles=" + getRoles() +
             "}";
     }
 }

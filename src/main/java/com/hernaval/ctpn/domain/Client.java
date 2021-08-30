@@ -2,12 +2,10 @@ package com.hernaval.ctpn.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import java.io.Serializable;
-import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 import javax.persistence.*;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
+import javax.validation.constraints.*;
 
 /**
  * A Client.
@@ -29,12 +27,26 @@ public class Client implements Serializable {
     @Column(name = "lastname")
     private String lastname;
 
-    @Column(name = "email")
+    @NotNull
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
+
+    @NotNull
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
+
+    @NotNull
+    @Column(name = "password", nullable = false)
+    private String password;
 
     @OneToMany(mappedBy = "client")
     @JsonIgnoreProperties(value = { "client", "car" }, allowSetters = true)
     private Set<Comment> comments = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "rel_client__role", joinColumns = @JoinColumn(name = "client_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
+    @JsonIgnoreProperties(value = { "clients" }, allowSetters = true)
+    private Set<Role> roles = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
@@ -89,6 +101,32 @@ public class Client implements Serializable {
         this.email = email;
     }
 
+    public String getUsername() {
+        return this.username;
+    }
+
+    public Client username(String username) {
+        this.username = username;
+        return this;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getPassword() {
+        return this.password;
+    }
+
+    public Client password(String password) {
+        this.password = password;
+        return this;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public Set<Comment> getComments() {
         return this.comments;
     }
@@ -120,6 +158,31 @@ public class Client implements Serializable {
         this.comments = comments;
     }
 
+    public Set<Role> getRoles() {
+        return this.roles;
+    }
+
+    public Client roles(Set<Role> roles) {
+        this.setRoles(roles);
+        return this;
+    }
+
+    public Client addRole(Role role) {
+        this.roles.add(role);
+        role.getClients().add(this);
+        return this;
+    }
+
+    public Client removeRole(Role role) {
+        this.roles.remove(role);
+        role.getClients().remove(this);
+        return this;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here
 
     @Override
@@ -147,6 +210,8 @@ public class Client implements Serializable {
             ", firstname='" + getFirstname() + "'" +
             ", lastname='" + getLastname() + "'" +
             ", email='" + getEmail() + "'" +
+            ", username='" + getUsername() + "'" +
+            ", password='" + getPassword() + "'" +
             "}";
     }
 }
