@@ -1,13 +1,14 @@
 package com.hernaval.ctpn.service.impl;
 
 import com.hernaval.ctpn.domain.Client;
+import com.hernaval.ctpn.domain.Role;
+import com.hernaval.ctpn.domain.enumeration.ERole;
 import com.hernaval.ctpn.repository.ClientRepository;
 import com.hernaval.ctpn.service.ClientService;
 import com.hernaval.ctpn.service.dto.ClientDTO;
 import com.hernaval.ctpn.service.mapper.ClientMapper;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Optional;
+import io.undertow.util.BadRequestException;
+import java.util.*;
 import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,10 +35,28 @@ public class ClientServiceImpl implements ClientService {
         this.clientMapper = clientMapper;
     }
 
-    @Override
     public ClientDTO save(ClientDTO clientDTO) {
+        log.debug("Request to update Client : {}", clientDTO);
+        Client client = clientMapper.toEntity(clientDTO);
+
+        client = clientRepository.save(client);
+        return clientMapper.toDto(client);
+    }
+
+    @Override
+    public ClientDTO signup(ClientDTO clientDTO) throws BadRequestException {
         log.debug("Request to save Client : {}", clientDTO);
         Client client = clientMapper.toEntity(clientDTO);
+        if (clientRepository.existsByUsername(clientDTO.getUsername())) {
+            throw new BadRequestException("Client with username is already exist");
+        }
+
+        Set<Role> roles = new HashSet<>();
+        Role roleAdmin = new Role();
+        roleAdmin.setName(ERole.ROLE_ADMIN);
+        roles.add(roleAdmin);
+        client.setRoles(roles);
+
         client = clientRepository.save(client);
         return clientMapper.toDto(client);
     }
