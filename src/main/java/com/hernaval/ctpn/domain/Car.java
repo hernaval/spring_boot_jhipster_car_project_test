@@ -28,7 +28,7 @@ public class Car implements Serializable {
 
     @OneToMany(mappedBy = "car")
     @JsonIgnoreProperties(value = { "client", "car" }, allowSetters = true)
-    private Set<Comment> comments = new HashSet<>();
+    private Set<Commenter> commenters = new HashSet<>();
 
     // jhipster-needle-entity-add-field - JHipster will add fields here
     public Long getId() {
@@ -70,35 +70,35 @@ public class Car implements Serializable {
         this.description = description;
     }
 
-    public Set<Comment> getComments() {
-        return this.comments;
+    public Set<Commenter> getCommenters() {
+        return this.commenters;
     }
 
-    public Car comments(Set<Comment> comments) {
-        this.setComments(comments);
+    public Car commenters(Set<Commenter> commenters) {
+        this.setCommenters(commenters);
         return this;
     }
 
-    public Car addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.setCar(this);
+    public Car addCommenter(Commenter commenter) {
+        this.commenters.add(commenter);
+        commenter.setCar(this);
         return this;
     }
 
-    public Car removeComment(Comment comment) {
-        this.comments.remove(comment);
-        comment.setCar(null);
+    public Car removeCommenter(Commenter commenter) {
+        this.commenters.remove(commenter);
+        commenter.setCar(null);
         return this;
     }
 
-    public void setComments(Set<Comment> comments) {
-        if (this.comments != null) {
-            this.comments.forEach(i -> i.setCar(null));
+    public void setCommenters(Set<Commenter> commenters) {
+        if (this.commenters != null) {
+            this.commenters.forEach(i -> i.setCar(null));
         }
-        if (comments != null) {
-            comments.forEach(i -> i.setCar(this));
+        if (commenters != null) {
+            commenters.forEach(i -> i.setCar(this));
         }
-        this.comments = comments;
+        this.commenters = commenters;
     }
 
     // jhipster-needle-entity-add-getters-setters - JHipster will add getters and setters here

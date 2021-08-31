@@ -41,9 +41,9 @@ public class Client implements Serializable {
 
     @OneToMany(mappedBy = "client")
     @JsonIgnoreProperties(value = { "client", "car" }, allowSetters = true)
-    private Set<Comment> comments = new HashSet<>();
+    private Set<Commenter> commenters = new HashSet<>();
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany
     @JoinTable(name = "rel_client__role", joinColumns = @JoinColumn(name = "client_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnoreProperties(value = { "clients" }, allowSetters = true)
     private Set<Role> roles = new HashSet<>();
@@ -127,35 +127,35 @@ public class Client implements Serializable {
         this.password = password;
     }
 
-    public Set<Comment> getComments() {
-        return this.comments;
+    public Set<Commenter> getCommenters() {
+        return this.commenters;
     }
 
-    public Client comments(Set<Comment> comments) {
-        this.setComments(comments);
+    public Client commenters(Set<Commenter> commenters) {
+        this.setCommenters(commenters);
         return this;
     }
 
-    public Client addComment(Comment comment) {
-        this.comments.add(comment);
-        comment.setClient(this);
+    public Client addCommenter(Commenter commenter) {
+        this.commenters.add(commenter);
+        commenter.setClient(this);
         return this;
     }
 
-    public Client removeComment(Comment comment) {
-        this.comments.remove(comment);
-        comment.setClient(null);
+    public Client removeCommenter(Commenter commenter) {
+        this.commenters.remove(commenter);
+        commenter.setClient(null);
         return this;
     }
 
-    public void setComments(Set<Comment> comments) {
-        if (this.comments != null) {
-            this.comments.forEach(i -> i.setClient(null));
+    public void setCommenters(Set<Commenter> commenters) {
+        if (this.commenters != null) {
+            this.commenters.forEach(i -> i.setClient(null));
         }
-        if (comments != null) {
-            comments.forEach(i -> i.setClient(this));
+        if (commenters != null) {
+            commenters.forEach(i -> i.setClient(this));
         }
-        this.comments = comments;
+        this.commenters = commenters;
     }
 
     public Set<Role> getRoles() {
