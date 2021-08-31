@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,8 +54,8 @@ public class ClientServiceImpl implements ClientService {
         clientDTO.setPassword(encoder.encode(clientDTO.getPassword()));
         log.debug("Request to save Client : {}", clientDTO);
         Client client = clientMapper.toEntity(clientDTO);
-        if (clientRepository.existsByUsername(clientDTO.getUsername())) {
-            throw new BadRequestException("Client with username is already exist");
+        if (clientRepository.existsByUsername(clientDTO.getUsername()) || clientRepository.existsByEmail(clientDTO.getEmail())) {
+            throw new BadRequestException("Client with username or email is already exist");
         }
 
         Set<Role> roles = new HashSet<>();
@@ -104,6 +105,11 @@ public class ClientServiceImpl implements ClientService {
     public Optional<ClientDTO> findOne(Long id) {
         log.debug("Request to get Client : {}", id);
         return clientRepository.findOneWithEagerRelationships(id).map(clientMapper::toDto);
+    }
+
+    @Override
+    public Optional<ClientDTO> findByUsername(String username) {
+        return clientRepository.findByUsername(username).map(clientMapper::toDto);
     }
 
     @Override

@@ -59,6 +59,12 @@ public interface ClientService {
     Optional<ClientDTO> findOne(Long id);
 
     /**
+     * @param username the username of entity
+     * @return the entity
+     */
+    Optional<ClientDTO> findByUsername(String username);
+
+    /**
      * Delete the "id" client.
      *
      * @param id the id of the entity.
