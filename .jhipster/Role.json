@@ -1,0 +1,32 @@
+{
+  "name": "Role",
+  "fields": [
+    {
+      "fieldName": "name",
+      "fieldType": "ERole",
+      "fieldValues": "ROLE_ADMIN,ROLE_USER,ROLE_ANONYMOUS"
+    }
+  ],
+  "relationships": [
+    {
+      "relationshipType": "many-to-many",
+      "otherEntityName": "client",
+      "otherEntityRelationshipName": "role",
+      "relationshipName": "client",
+      "ownerSide": false
+    }
+  ],
+  "entityTableName": "role",
+  "dto": "mapstruct",
+  "pagination": "no",
+  "service": "serviceImpl",
+  "jpaMetamodelFiltering": false,
+  "fluentMethods": true,
+  "readOnly": false,
+  "embedded": false,
+  "applications": "*",
+  "microserviceName": "CarTestProjectNaval",
+  "clientRootFolder": "CarTestProjectNaval",
+  "databaseType": "sql",
+  "changelogDate": "20210830190413"
+}

@@ -4,6 +4,7 @@ import com.hernaval.ctpn.repository.ClientRepository;
 import com.hernaval.ctpn.service.ClientService;
 import com.hernaval.ctpn.service.dto.ClientDTO;
 import com.hernaval.ctpn.web.rest.errors.BadRequestAlertException;
+import io.undertow.util.BadRequestException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.List;
@@ -43,26 +44,6 @@ public class ClientResource {
     }
 
     /**
-     * {@code POST  /clients} : Create a new client.
-     *
-     * @param clientDTO the clientDTO to create.
-     * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new clientDTO, or with status {@code 400 (Bad Request)} if the client has already an ID.
-     * @throws URISyntaxException if the Location URI syntax is incorrect.
-     */
-    @PostMapping("/clients")
-    public ResponseEntity<ClientDTO> createClient(@Valid @RequestBody ClientDTO clientDTO) throws URISyntaxException {
-        log.debug("REST request to save Client : {}", clientDTO);
-        if (clientDTO.getId() != null) {
-            throw new BadRequestAlertException("A new client cannot already have an ID", ENTITY_NAME, "idexists");
-        }
-        ClientDTO result = clientService.save(clientDTO);
-        return ResponseEntity
-            .created(new URI("/api/clients/" + result.getId()))
-            .headers(HeaderUtil.createEntityCreationAlert(applicationName, false, ENTITY_NAME, result.getId().toString()))
-            .body(result);
-    }
-
-    /**
      * {@code PUT  /clients/:id} : Updates an existing client.
      *
      * @param id the id of the clientDTO to save.
@@ -76,7 +57,7 @@ public class ClientResource {
     public ResponseEntity<ClientDTO> updateClient(
         @PathVariable(value = "id", required = false) final Long id,
         @Valid @RequestBody ClientDTO clientDTO
-    ) throws URISyntaxException {
+    ) throws URISyntaxException, BadRequestException {
         log.debug("REST request to update Client : {}, {}", id, clientDTO);
         if (clientDTO.getId() == null) {
             throw new BadRequestAlertException("Invalid id", ENTITY_NAME, "idnull");
