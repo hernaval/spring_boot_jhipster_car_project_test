@@ -43,7 +43,7 @@ public class Client implements Serializable {
     @JsonIgnoreProperties(value = { "client", "car" }, allowSetters = true)
     private Set<Comment> comments = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(cascade = CascadeType.ALL)
     @JoinTable(name = "rel_client__role", joinColumns = @JoinColumn(name = "client_id"), inverseJoinColumns = @JoinColumn(name = "role_id"))
     @JsonIgnoreProperties(value = { "clients" }, allowSetters = true)
     private Set<Role> roles = new HashSet<>();
