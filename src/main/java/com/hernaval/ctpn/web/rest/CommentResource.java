@@ -1,5 +1,8 @@
 package com.hernaval.ctpn.web.rest;
 
+import com.hernaval.ctpn.domain.Client;
+import com.hernaval.ctpn.repository.CarRepository;
+import com.hernaval.ctpn.repository.ClientRepository;
 import com.hernaval.ctpn.repository.CommentRepository;
 import com.hernaval.ctpn.service.CommentService;
 import com.hernaval.ctpn.service.dto.CommentDTO;
@@ -9,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javassist.NotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -37,9 +41,19 @@ public class CommentResource {
 
     private final CommentRepository commentRepository;
 
-    public CommentResource(CommentService commentService, CommentRepository commentRepository) {
+    private final ClientRepository clientRepository;
+    private final CarRepository carRepository;
+
+    public CommentResource(
+        CommentService commentService,
+        CommentRepository commentRepository,
+        ClientRepository clientRepository,
+        CarRepository carRepository
+    ) {
         this.commentService = commentService;
         this.commentRepository = commentRepository;
+        this.clientRepository = clientRepository;
+        this.carRepository = carRepository;
     }
 
     /**
@@ -47,6 +61,7 @@ public class CommentResource {
      *
      * @param commentDTO the commentDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new commentDTO, or with status {@code 400 (Bad Request)} if the comment has already an ID.
+     * or {code@404} if client id or car id not found
      * @throws URISyntaxException if the Location URI syntax is incorrect.
      */
     @PostMapping("/comments")
@@ -55,6 +70,15 @@ public class CommentResource {
         if (commentDTO.getId() != null) {
             throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        clientRepository
+            .findById(commentDTO.getClient().getId())
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "id client not found"));
+
+        carRepository
+            .findById(commentDTO.getCar().getId())
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "car", "id car not found"));
+
         CommentDTO result = commentService.save(commentDTO);
         return ResponseEntity
             .created(new URI("/api/comments/" + result.getId()))

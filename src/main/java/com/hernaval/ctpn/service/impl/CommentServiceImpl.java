@@ -5,6 +5,7 @@ import com.hernaval.ctpn.repository.CommentRepository;
 import com.hernaval.ctpn.service.CommentService;
 import com.hernaval.ctpn.service.dto.CommentDTO;
 import com.hernaval.ctpn.service.mapper.CommentMapper;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -36,6 +37,7 @@ public class CommentServiceImpl implements CommentService {
     public CommentDTO save(CommentDTO commentDTO) {
         log.debug("Request to save Comment : {}", commentDTO);
         Comment comment = commentMapper.toEntity(commentDTO);
+        comment.setPublishDate(new Date().toInstant());
         comment = commentRepository.save(comment);
         return commentMapper.toDto(comment);
     }
