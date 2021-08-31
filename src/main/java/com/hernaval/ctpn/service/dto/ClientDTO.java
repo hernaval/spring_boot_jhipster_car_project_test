@@ -1,5 +1,7 @@
 package com.hernaval.ctpn.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Objects;
@@ -24,6 +26,7 @@ public class ClientDTO implements Serializable {
     private String username;
 
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private String password;
 
     private Set<RoleDTO> roles = new HashSet<>();

@@ -105,4 +105,8 @@ public class TokenProvider {
         }
         return false;
     }
+
+    public Jws<Claims> getTokenInfo(String authToken) {
+        return jwtParser.parseClaimsJws(authToken);
+    }
 }
