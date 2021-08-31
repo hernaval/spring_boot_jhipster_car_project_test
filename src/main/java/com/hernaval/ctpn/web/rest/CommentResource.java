@@ -61,12 +61,11 @@ public class CommentResource {
      *
      * @param commentDTO the commentDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new commentDTO, or with status {@code 400 (Bad Request)} if the comment has already an ID.
+     * or {code@404} if client id or car id not found
      * @throws URISyntaxException if the Location URI syntax is incorrect.
-     * @throws NotFoundException if id client or id car not exist
      */
     @PostMapping("/comments")
-    public ResponseEntity<CommentDTO> createComment(@Valid @RequestBody CommentDTO commentDTO)
-        throws URISyntaxException, NotFoundException {
+    public ResponseEntity<CommentDTO> createComment(@Valid @RequestBody CommentDTO commentDTO) throws URISyntaxException {
         log.debug("REST request to save Comment : {}", commentDTO);
         if (commentDTO.getId() != null) {
             throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
@@ -74,11 +73,11 @@ public class CommentResource {
 
         clientRepository
             .findById(commentDTO.getClient().getId())
-            .orElseThrow(() -> new NotFoundException(String.format("No user with id %s", commentDTO.getClient().getId())));
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "client", "id client not found"));
 
         carRepository
             .findById(commentDTO.getCar().getId())
-            .orElseThrow(() -> new NotFoundException(String.format("No car with id %s", commentDTO.getCar().getId())));
+            .orElseThrow(() -> new BadRequestAlertException("Entity not found", "car", "id car not found"));
 
         CommentDTO result = commentService.save(commentDTO);
         return ResponseEntity
