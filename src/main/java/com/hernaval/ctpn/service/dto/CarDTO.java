@@ -1,11 +1,18 @@
 package com.hernaval.ctpn.service.dto;
 
+import com.fasterxml.jackson.annotation.JsonFilter;
+import com.hernaval.ctpn.domain.Commenter;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 /**
  * A DTO for the {@link com.hernaval.ctpn.domain.Car} entity.
+ * An object Filter {@link com.hernaval.ctpn.service.response_filter.CommentFilter} for Http Response
  */
+@JsonFilter("commentFilterOnAnonymousClient")
 public class CarDTO implements Serializable {
 
     private Long id;
@@ -13,6 +20,8 @@ public class CarDTO implements Serializable {
     private String mark;
 
     private String description;
+
+    private Set<Commenter> commenters = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -36,6 +45,14 @@ public class CarDTO implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public Set<Commenter> getCommenters() {
+        return commenters;
+    }
+
+    public void setCommenters(Set<Commenter> commenters) {
+        this.commenters = commenters;
     }
 
     @Override

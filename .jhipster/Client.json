@@ -28,9 +28,9 @@
   "relationships": [
     {
       "relationshipType": "one-to-many",
-      "otherEntityName": "comment",
+      "otherEntityName": "commenter",
       "otherEntityRelationshipName": "client",
-      "relationshipName": "comment"
+      "relationshipName": "commenter"
     },
     {
       "relationshipType": "many-to-many",

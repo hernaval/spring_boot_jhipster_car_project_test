@@ -67,7 +67,7 @@ public class CarServiceImpl implements CarService {
     @Transactional(readOnly = true)
     public Optional<CarDTO> findOne(Long id) {
         log.debug("Request to get Car : {}", id);
-        return carRepository.findById(id).map(carMapper::toDto);
+        return carRepository.findOneWithEagerRelationships(id).map(carMapper::toDto);
     }
 
     @Override

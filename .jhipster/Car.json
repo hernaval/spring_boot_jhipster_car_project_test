@@ -13,9 +13,9 @@
   "relationships": [
     {
       "relationshipType": "one-to-many",
-      "otherEntityName": "comment",
+      "otherEntityName": "commenter",
       "otherEntityRelationshipName": "car",
-      "relationshipName": "comment"
+      "relationshipName": "commenter"
     }
   ],
   "entityTableName": "car",

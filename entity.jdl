@@ -15,16 +15,16 @@ entity Car{
     description String
 }
 
-entity Comment {
+entity Commenter {
 	message String	required
     publishDate Instant
 }
 
 relationship OneToMany {
-	Client to Comment
+	Client{commenter} to Commenter{client}
 }
 relationship OneToMany {
-	Car to Comment
+	Car{commenter} to Commenter{car}
 }
 relationship ManyToMany {
 	Client{role} to Role{client}
