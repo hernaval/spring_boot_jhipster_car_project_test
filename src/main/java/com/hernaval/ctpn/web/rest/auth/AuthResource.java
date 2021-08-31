@@ -3,6 +3,7 @@ package com.hernaval.ctpn.web.rest.auth;
 import com.hernaval.ctpn.security.jwt.TokenProvider;
 import com.hernaval.ctpn.service.ClientService;
 import com.hernaval.ctpn.service.dto.ClientDTO;
+import com.hernaval.ctpn.service.dto.TokenResponseDTO;
 import com.hernaval.ctpn.web.rest.ClientResource;
 import com.hernaval.ctpn.web.rest.errors.BadRequestAlertException;
 import io.undertow.util.BadRequestException;
@@ -39,7 +40,7 @@ public class AuthResource {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> loginClient(@RequestBody ClientDTO clientDTO) {
+    public ResponseEntity<TokenResponseDTO> loginClient(@RequestBody ClientDTO clientDTO) {
         log.debug("received client dto for login {}", clientDTO);
 
         Optional<?> client = clientService.findByUsername(clientDTO.getUsername());
@@ -54,9 +55,11 @@ public class AuthResource {
 
         SecurityContextHolder.getContext().setAuthentication(auth);
         String jwt = tokenProvider.createToken(auth, true);
+        long expiredIn = tokenProvider.getTokenInfo(jwt).getBody().getExpiration().getTime();
+        String owner = tokenProvider.getTokenInfo(jwt).getBody().getSubject();
 
         log.info(jwt);
-        return ResponseEntity.ok(jwt);
+        return ResponseEntity.ok(new TokenResponseDTO(jwt, expiredIn, owner));
     }
 
     @PostMapping("/signup")
