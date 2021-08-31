@@ -1,5 +1,8 @@
 package com.hernaval.ctpn.web.rest;
 
+import com.hernaval.ctpn.domain.Client;
+import com.hernaval.ctpn.repository.CarRepository;
+import com.hernaval.ctpn.repository.ClientRepository;
 import com.hernaval.ctpn.repository.CommentRepository;
 import com.hernaval.ctpn.service.CommentService;
 import com.hernaval.ctpn.service.dto.CommentDTO;
@@ -9,6 +12,7 @@ import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import javassist.NotFoundException;
 import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import org.slf4j.Logger;
@@ -37,9 +41,19 @@ public class CommentResource {
 
     private final CommentRepository commentRepository;
 
-    public CommentResource(CommentService commentService, CommentRepository commentRepository) {
+    private final ClientRepository clientRepository;
+    private final CarRepository carRepository;
+
+    public CommentResource(
+        CommentService commentService,
+        CommentRepository commentRepository,
+        ClientRepository clientRepository,
+        CarRepository carRepository
+    ) {
         this.commentService = commentService;
         this.commentRepository = commentRepository;
+        this.clientRepository = clientRepository;
+        this.carRepository = carRepository;
     }
 
     /**
@@ -48,13 +62,24 @@ public class CommentResource {
      * @param commentDTO the commentDTO to create.
      * @return the {@link ResponseEntity} with status {@code 201 (Created)} and with body the new commentDTO, or with status {@code 400 (Bad Request)} if the comment has already an ID.
      * @throws URISyntaxException if the Location URI syntax is incorrect.
+     * @throws NotFoundException if id client or id car not exist
      */
     @PostMapping("/comments")
-    public ResponseEntity<CommentDTO> createComment(@Valid @RequestBody CommentDTO commentDTO) throws URISyntaxException {
+    public ResponseEntity<CommentDTO> createComment(@Valid @RequestBody CommentDTO commentDTO)
+        throws URISyntaxException, NotFoundException {
         log.debug("REST request to save Comment : {}", commentDTO);
         if (commentDTO.getId() != null) {
             throw new BadRequestAlertException("A new comment cannot already have an ID", ENTITY_NAME, "idexists");
         }
+
+        clientRepository
+            .findById(commentDTO.getClient().getId())
+            .orElseThrow(() -> new NotFoundException(String.format("No user with id %s", commentDTO.getClient().getId())));
+
+        carRepository
+            .findById(commentDTO.getCar().getId())
+            .orElseThrow(() -> new NotFoundException(String.format("No car with id %s", commentDTO.getCar().getId())));
+
         CommentDTO result = commentService.save(commentDTO);
         return ResponseEntity
             .created(new URI("/api/comments/" + result.getId()))
