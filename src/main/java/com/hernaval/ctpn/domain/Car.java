@@ -26,7 +26,7 @@ public class Car implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @OneToMany(mappedBy = "car")
+    @OneToMany(mappedBy = "car", fetch = FetchType.EAGER)
     @JsonIgnoreProperties(value = { "client", "car" }, allowSetters = true)
     private Set<Commenter> commenters = new HashSet<>();
 

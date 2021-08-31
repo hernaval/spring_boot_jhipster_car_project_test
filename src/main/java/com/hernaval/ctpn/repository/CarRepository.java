@@ -12,6 +12,6 @@ import org.springframework.stereotype.Repository;
 @SuppressWarnings("unused")
 @Repository
 public interface CarRepository extends JpaRepository<Car, Long> {
-    @Query("select car from Car car left join fetch car.comments where car.id =:id")
+    @Query("select car from Car car left join fetch car.commenters where car.id =:id")
     Optional<Car> findOneWithEagerRelationships(@Param("id") Long id);
 }
