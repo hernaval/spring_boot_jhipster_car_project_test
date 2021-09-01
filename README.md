@@ -7,7 +7,7 @@ This application is configured for Service Discovery and Configuration with . On
 
 ## DEMO
 
-This is a [link](http://https://www.loom.com/share/ae060ea87a864fc489962f7b19ced2ad 'link') demonstrating the API with Firecamp.
+This is a [link](https://www.loom.com/share/ae060ea87a864fc489962f7b19ced2ad 'link') demonstrating the API with Firecamp.
 With :
 
 - Signup
